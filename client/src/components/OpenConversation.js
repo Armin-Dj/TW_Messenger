@@ -19,7 +19,7 @@ export default function OpenConversation() {
         <div className="d-flex flex-column  flex-grow-1">
             <div className="flex-grow-1 overflow-auto">
                 <div className="h-100 d-flex flex-column align-items-start justify-content-end px-3">
-                    {selectedConversation.messages.map((messages, index) =>{
+                    {selectedConversation.messages.map((message, index) =>{
                         return (
                             <div
                                 key={index}
