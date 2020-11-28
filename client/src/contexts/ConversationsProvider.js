@@ -1,6 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import useLocalStorage from '../hooks/useLocalStorage';
 import {useContacts} from './ContactsProvider';
+import { useSocket } from './SocketProvider';
 
 const ConversationsContext = React.createContext()
 
@@ -12,6 +13,7 @@ export function ConversationsProvider({id, children}) {
     const [conversations, setConversations] = useLocalStorage('conversations', [])
     const [selectedConversationIndex, setSelectedConversationIndex] = useState(0)
     const {contacts} = useContacts()
+    const socket = useSocket()
 
     function createConversation(recipients){
         setConversations(prevConversations => {
@@ -19,14 +21,14 @@ export function ConversationsProvider({id, children}) {
         })
     }
 
-    function addMessageToConversation({recipients, text, sender}){
+    const  addMessageToConversation = useCallback(({recipients, text, sender}) => {
         setConversations(prevConversations =>{
             let madeChange = false
             const newMessage = {sender, text}
             const newConversations = prevConversations.map(conversation => {
                 if(arrayEquality(conversation.recipients, recipients)){
                     madeChange = true
-                    return {...conversation, messages: [conversation.messages, newMessage]}
+                    return {...conversation, messages: [...conversation.messages, newMessage]}
                 }
 
                 return conversation  
@@ -36,12 +38,21 @@ export function ConversationsProvider({id, children}) {
                 
             } else {
                 return [...prevConversations,
-                    {recipients, messages: [newMessage]}]
+                    {recipients, messages: [newMessage] }]
             }
         })
-    }
+    }, [setConversations])
+
+    //not to have references to each received message I used useEffect
+    useEffect(()=>{
+        if(socket == null) return 
+
+        socket.on('receive-message', addMessageToConversation)
+        return () => socket.off('received-message')
+    }, [socket, addMessageToConversation])
 
     function sendMessage(recipients, text){
+        socket.emit('send-message',{recipients, text})
         addMessageToConversation({recipients, text, sender: id})
     }
 
