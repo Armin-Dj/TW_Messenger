@@ -41,7 +41,7 @@ export function ConversationsProvider({id, children}) {
         })
     }
 
-    function sendMessage({recipients, text}){
+    function sendMessage(recipients, text){
         addMessageToConversation({recipients, text, sender: id})
     }
 
