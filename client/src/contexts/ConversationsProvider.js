@@ -48,7 +48,7 @@ export function ConversationsProvider({id, children}) {
         if(socket == null) return 
 
         socket.on('receive-message', addMessageToConversation)
-        return () => socket.off('received-message')
+        return () => socket.off('receive-message')
     }, [socket, addMessageToConversation])
 
     function sendMessage(recipients, text){
