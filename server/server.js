@@ -8,7 +8,7 @@ io.on('connection', socket =>{
         recipeints.forEach(recipient => {
             const newRecipients = recipeints.filter(r => r !== recipient)
             newRecipients.push(id)
-            socket.broadcast.to(recipient).emit('receive-message',{
+            socket.broadcast.to(recipient).emit('receive-message', {
                 recipeints: newRecipients, sender: id, text
             })
         })
