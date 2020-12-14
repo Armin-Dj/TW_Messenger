@@ -3,7 +3,7 @@ in Messenger/server : execute ` npm start devStart `   -- script found in packag
 
 to test the connexion you should follow these steps, as of this commit it doesn't work:
 
-1) npm devStart
+1) npm start devStart
 2) npm start
 3) you should get a page open in your default browser to the page: http://localhost:3000/
 3') Just to be sure, you should press f12 and delete the local storage under application, you might need to press the arrow( f12 -> application -> local storage -> rightclick localhost 3000 -> clear)
