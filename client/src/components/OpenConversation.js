@@ -1,17 +1,16 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import { Form, InputGroup, Button } from 'react-bootstrap'
 import { useConversations } from '../contexts/ConversationsProvider'
-import { EmojiButton } from '@joeattardi/emoji-button';
+import EmojiChooser from './EmojiChooser';
 
 export default function OpenConversation() {
-    const picker = new EmojiButton();
-    const trigger = document.querySelector('.trigger');
     const [text, setText]= useState('')
     const setRef = useCallback(node =>{
         if(node){
             node.scrollIntoView({smooth: true})
         }
     },[])
+    const emojiContainerRef = useRef(null)
     const {sendMessage, selectedConversation} = useConversations()
 
     function handleSubmit(e){
@@ -20,21 +19,11 @@ export default function OpenConversation() {
         sendMessage(selectedConversation.recipients.map(r => r.id), text)
         setText('')
     }
-    function emojiHandler(e){
-        window.addEventListener('DOMContentLoaded', () => {
-            const button = document.querySelector('#emoji-button');
-            const picker = new EmojiButton();
-          
-            picker.on('emoji', emoji => {
-              document.querySelector('input').value += emoji;
-            });
-          
-            button.addEventListener('click', () => {
-              picker.pickerVisible ? picker.hidePicker() : picker.showPicker(button);
-            });
-          });
+
+    function handleEmoji(selection) {
+        setText(`${text} ${selection.emoji}`);
     }
-   
+
     return (
         <div className="d-flex flex-column  flex-grow-1">
             <div className="flex-grow-1 overflow-auto">
@@ -59,17 +48,25 @@ export default function OpenConversation() {
 
                 </div>
             </div>
-        <Form onSubmit={handleSubmit}>
+        <Form
+            ref={emojiContainerRef}
+            onSubmit={handleSubmit}
+        >
             <Form.Group className="m-2">
                 <InputGroup>
                     <Form.Control as="textarea"
-                    required 
+                    required
                     value ={text}
                     onChange={e => setText(e.target.value)}
                     style={{height: '75px', resize: 'none'}}
                     />
                     <InputGroup.Append>
-                    <button id="emoji-button">😀</button>
+                        <EmojiChooser
+                            rootElement={emojiContainerRef}
+                            onSelect={handleEmoji}
+                        >
+                            😀
+                        </EmojiChooser>
                         <Button type='submit'>
                             Send
                         </Button>
